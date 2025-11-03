@@ -1,6 +1,7 @@
 import type { ClientOptions as AnthropicClientOptionsBase } from "@anthropic-ai/sdk";
 import type { GoogleVertexProviderSettings as GoogleVertexProviderSettingsBase } from "@ai-sdk/google-vertex";
 import type { LanguageModelV2 } from "@ai-sdk/provider";
+import { GoogleGenAIOptions as GoogleGenAIClientOptions } from "@google/genai";
 import type { ClientOptions as OpenAIClientOptionsBase } from "openai";
 import type { AgentProviderType } from "./agent";
 
@@ -103,6 +104,7 @@ export type ClientOptions = (
   | OpenAIClientOptions
   | AnthropicClientOptions
   | GoogleVertexProviderSettings
+  | GoogleGenAIClientOptions
 ) & {
   apiKey?: string;
   provider?: AgentProviderType;
