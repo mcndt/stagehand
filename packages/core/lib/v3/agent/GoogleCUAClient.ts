@@ -6,7 +6,6 @@ import {
   FunctionCall,
   GenerateContentConfig,
   Tool,
-  GoogleGenAIOptions,
 } from "@google/genai";
 import { LogLine } from "../types/public/logs";
 import {
@@ -45,7 +44,6 @@ import { v7 as uuidv7 } from "uuid";
  * This implementation uses the Google Generative AI SDK for Computer Use
  */
 export class GoogleCUAClient extends AgentClient {
-  private apiKey: string;
   private client: GoogleGenAI;
   private currentViewport = { width: 1288, height: 711 };
   private currentUrl?: string;
@@ -56,7 +54,6 @@ export class GoogleCUAClient extends AgentClient {
     "ENVIRONMENT_BROWSER";
   private generateContentConfig: GenerateContentConfig;
   private tools?: ToolSet;
-  private baseURL?: string;
   private safetyConfirmationHandler?: SafetyConfirmationHandler;
   constructor(
     type: AgentType,
@@ -69,20 +66,16 @@ export class GoogleCUAClient extends AgentClient {
 
     this.tools = tools;
     // Process client options
-    this.apiKey =
-      (clientOptions?.apiKey as string) ||
+    clientOptions = clientOptions || {};
+    clientOptions.apiKey =
+      (clientOptions.apiKey as string) ||
       process.env.GEMINI_API_KEY ||
       process.env.GOOGLE_GENERATIVE_AI_API_KEY ||
       process.env.GOOGLE_API_KEY ||
-      "";
-    this.baseURL = clientOptions?.baseURL as string | undefined;
+      undefined;
 
     // Initialize the Google Generative AI client
-    const genAIOptions: GoogleGenAIOptions = {
-      apiKey: this.apiKey,
-      ...(this.baseURL ? { httpOptions: { baseUrl: this.baseURL } } : {}),
-    };
-    this.client = new GoogleGenAI(genAIOptions);
+    this.client = new GoogleGenAI(clientOptions);
 
     // Get environment if specified
     if (
@@ -110,10 +103,7 @@ export class GoogleCUAClient extends AgentClient {
     };
 
     // Store client options for reference
-    this.clientOptions = {
-      apiKey: this.apiKey,
-      ...(this.baseURL ? { baseURL: this.baseURL } : {}),
-    };
+    this.clientOptions = clientOptions;
 
     // Initialize tools if provided
     if (this.tools && Object.keys(this.tools).length > 0) {
